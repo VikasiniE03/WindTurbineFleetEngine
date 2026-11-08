@@ -1,14 +1,6 @@
 # Renewable Wind Turbine Fleet Predictive Maintenance Engine
 ### Project Assignment Set 24 | Enterprise Cloud Solutions Architecture
 
-[![Java 17+](https://img.shields.io/badge/Java-17%2B%20%7C%2025-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![MySQL 8.0+](https://img.shields.io/badge/MySQL-8.0%2B%20InnoDB-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Concurrency](https://img.shields.io/badge/Concurrency-ExecutorService%20ThreadPool-blue?style=for-the-badge)](https://docs.oracle.com/en/java/)
-[![Architecture](https://img.shields.io/badge/Architecture-2--Tier%20Cloud%20VM-F80000?style=for-the-badge&logo=oracle&logoColor=white)](OCI_Architecture_Report.md)
-[![Standards](https://img.shields.io/badge/Standard-ISO%2010816--21%20%7C%20IEC%2061400--25-green?style=for-the-badge)](https://www.iso.org/)
-
----
-
 ## 1. Project Overview & System Architecture
 
 The **Renewable Wind Turbine Fleet Predictive Maintenance Engine** is a high-throughput, concurrent telemetry processing and health analytics platform built to monitor distributed wind turbine assets across harsh environmental operating environments.
@@ -209,19 +201,7 @@ mvn exec:java -Dexec.mainClass="MainApp"
 
 ---
 
-## 8. Git & GitHub Deployment
+## BY
 
-The repository is configured to sync directly with target GitHub user **`VikasiniE03`**.
-
-To push updates:
-```bash
-# On Linux / macOS / Git Bash:
-chmod +x push_to_github.sh
-./push_to_github.sh
-
-# On Windows PowerShell:
-.\push_to_github.ps1
-```
-
----
-*Developed for Project Assignment Set 24: Renewable Wind Turbine Fleet Predictive Maintenance Engine.*
+TRISHNA A K- 25ITR164
+VIKASINI E - 25ITR172
