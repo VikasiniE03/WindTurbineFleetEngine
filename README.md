@@ -1,5 +1,13 @@
 # Renewable Wind Turbine Fleet Predictive Maintenance Engine
-### Project Assignment Set 24 | Enterprise Cloud Solutions Architecture
+
+## Project Information
+
+- **Project Title:** Enterprise Cloud Solutions Architecture
+- **Institution:** Kongu Engineering College
+- **Department:** Information Technology
+- **Course:** 24ITT32 – Programming in Java
+- **Developed by:** TRISHNA A K, VIKASINI E
+- **Roll Number:** 25ITR164, 25ITR172
 
 ## 1. Project Overview & System Architecture
 
