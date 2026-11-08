@@ -1,0 +1,24 @@
+====================================================================================================
+                    RENEWABLE WIND TURBINE FLEET SAFETY LOCKOUT & DOWNTIME AUDIT                    
+                              OPERATIONAL TRIPPED TURBINE SUMMARY REPORT                            
+====================================================================================================
+Report Generated: 2026-11-08 15:53:49 | Safety Filter: Mechanical Brake Lock Auto-Trigger
+Lockout Conditions: Gearbox Temp > Cap OR Blade Vibration > 4.5 mm/s OR Health Index < 60
+====================================================================================================
+TURBINE SERIAL ID  | FARM SECTOR      | OPERATIONAL CATEGORY     | ROOT CAUSE INCIDENT | METRIC / CAP | LOCKOUT STATUS
+----------------------------------------------------------------------------------------------------
+TURB-OFF-1001      | North-Sea-Sector-A | OFFSHORE DEEPWATER TURBINE | GEARBOX_OVERHEAT (Temp: 88.5°C > 85.0°C Cap) | T:88.5/V:2.20 | BRAKE_LOCKED  
+TURB-OFF-1002      | North-Sea-Sector-A | OFFSHORE DEEPWATER TURBINE | EXCESSIVE_BLADE_VIBRATION (Vib: 4.85 mm/s > 4.5 mm/s) | T:45.0/V:4.85 | BRAKE_LOCKED  
+TURB-DES-2002      | Mojave-Sector-2  | ONSHORE DESERT TURBINE   | THI_DEGRADATION (Index: 23.11 < 60.0 Threshold) | T:65.0/V:2.10 | BRAKE_LOCKED  
+TURB-DES-2001      | Mojave-Sector-1  | ONSHORE DESERT TURBINE   | GEARBOX_OVERHEAT (Temp: 93.5°C > 90.0°C Cap) | T:93.5/V:1.50 | BRAKE_LOCKED  
+TURB-MNT-3001      | Alpine-Ridge-North | HIGH-ALTITUDE MOUNTAIN TURBINE | GEARBOX_OVERHEAT (Temp: 84.5°C > 80.0°C Cap) | T:84.5/V:1.90 | BRAKE_LOCKED  
+TURB-TOOLONGID-1000 | Desert-Beta      | ONSHORE DESERT TURBINE   | CORRUPT_SERIAL_ID  | REGEX_MISMATCH | REJECTED_INPUT
+TURB-MNT-3002      | Alpine-Ridge-South | HIGH-ALTITUDE MOUNTAIN TURBINE | EXCESSIVE_BLADE_VIBRATION (Vib: 4.75 mm/s > 4.5 mm/s) | T:35.0/V:4.75 | BRAKE_LOCKED  
+TURB-1004          | Alpine-Gamma     | HIGH-ALTITUDE MOUNTAIN TURBINE | CORRUPT_SERIAL_ID  | REGEX_MISMATCH | REJECTED_INPUT
+INVALID-TURBINE-999 | Offshore-Alpha   | OFFSHORE DEEPWATER TURBINE | CORRUPT_SERIAL_ID  | REGEX_MISMATCH | REJECTED_INPUT
+----------------------------------------------------------------------------------------------------
+TOTAL TRIPPED TURBINES FLAGGED FOR LOCKOUT: 6
+ACTION REQUIRED: Field technician dispatch required before mechanical brake release.
+====================================================================================================
+                                      END OF DOWNTIME AUDIT                                         
+====================================================================================================
