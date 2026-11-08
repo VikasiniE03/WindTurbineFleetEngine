@@ -2,7 +2,7 @@
 
 ## Project Information
 
-- **Project Title:** Enterprise Cloud Solutions Architecture
+- **Project Title:** Renewable Wind Turbine Fleet Predictive Maintenance Engine
 - **Institution:** Kongu Engineering College
 - **Department:** Information Technology
 - **Course:** 24ITT32 – Programming in Java
@@ -119,8 +119,6 @@ WindTurbineFleetEngine/
 ├── pom.xml                        # Maven build and dependency configuration
 ├── build_and_run.bat              # Windows batch compilation and execution script
 ├── build_and_run.ps1              # PowerShell compilation and execution script
-├── push_to_github.sh              # Unix Git automation script for VikasiniE03
-├── push_to_github.ps1             # PowerShell Git & GitHub REST API automation script
 └── README.md                      # Complete system documentation and engineering guide
 ```
 
@@ -153,13 +151,6 @@ java -cp "bin;lib/*" MainApp
 java -cp "bin;lib/*" FleetEngineTest
 ```
 
-### 6.4 Option C: Maven Execution
-```bash
-mvn clean compile
-mvn exec:java -Dexec.mainClass="MainApp"
-```
-
----
 
 ## 7. Sample Engine Output
 
