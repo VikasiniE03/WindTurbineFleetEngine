@@ -3,7 +3,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,20 +17,32 @@ import java.util.concurrent.TimeUnit;
  * MainApp.java
  * Execution Entry Point for Renewable Wind Turbine Fleet Predictive Maintenance Engine.
  * 
- * Pipeline:
- * 1. Verifies 2-Tier Architecture connectivity (VM 1 App Host -> VM 2 DB Host simulation).
- * 2. Initializes thread-safe TicketWriter for work orders and downtime summary reports.
- * 3. Uses an ExecutorService (Fixed Thread Pool) to process SCADA telemetry in parallel.
- * 4. Submits PredictiveWorker tasks handling category formulas, brake locks, regex validation,
- *    SCADA error parsing, and output formatting.
- * 5. Awaits thread pool completion and outputs executive KPI dashboard to stdout.
+ * Capabilities:
+ * 1. Default Non-Interactive Batch Mode: Processes scada_wind.csv in parallel via ExecutorService,
+ *    writes predictive_maintenance_tickets.txt and downtime_summary_report.txt, and displays KPIs.
+ * 2. Interactive Management Console (--menu / -i): Allows real-time asset query, lockout review,
+ *    and running the automated test suite.
  */
 public class MainApp {
 
     private static final int THREAD_POOL_SIZE = 4;
     private static final String DEFAULT_CSV_FILE = "scada_wind.csv";
 
+    // In-memory cache of last processed results for interactive querying
+    private static final Map<String, PredictiveWorker.TelemetryResult> latestResults = new HashMap<>();
+
     public static void main(String[] args) {
+        if (args.length > 0 && (args[0].equalsIgnoreCase("--menu") || args[0].equalsIgnoreCase("-i"))) {
+            runInteractiveMenu();
+        } else {
+            runBatchEngine();
+        }
+    }
+
+    /**
+     * Core Batch Pipeline: Reads scada_wind.csv, runs multithreaded analysis, writes files, prints dashboard.
+     */
+    public static void runBatchEngine() {
         System.out.println("==========================================================================================");
         System.out.println("     RENEWABLE WIND TURBINE FLEET PREDICTIVE MAINTENANCE ENGINE (PROJECT SET 24)          ");
         System.out.println("==========================================================================================");
@@ -47,7 +62,6 @@ public class MainApp {
         String baseDir = System.getProperty("user.dir");
         File csvFile = new File(baseDir, DEFAULT_CSV_FILE);
         if (!csvFile.exists()) {
-            // Check parent or child directory fallback
             File parentCsv = new File(baseDir, "WindTurbineFleetEngine/" + DEFAULT_CSV_FILE);
             if (parentCsv.exists()) {
                 csvFile = parentCsv;
@@ -121,6 +135,8 @@ public class MainApp {
         int desertCount = 0;
         int mountainCount = 0;
 
+        latestResults.clear();
+
         for (Future<PredictiveWorker.TelemetryResult> future : futures) {
             try {
                 PredictiveWorker.TelemetryResult result = future.get();
@@ -128,6 +144,8 @@ public class MainApp {
                     validCount++;
                     sumHealthScore += result.healthScore;
                     sumCapacityFactor += result.capacityFactor;
+
+                    latestResults.put(result.turbineId, result);
 
                     if (result.category.contains("OFFSHORE")) offshoreCount++;
                     else if (result.category.contains("DESERT")) desertCount++;
@@ -190,5 +208,85 @@ public class MainApp {
         System.out.printf("|   * Downtime File : %-64s |%n", ticketWriter.getDowntimeFile().getName());
         System.out.println("==========================================================================================");
         System.out.println("[SUCCESS] Renewable Wind Turbine Fleet Predictive Maintenance Engine execution complete.\n");
+    }
+
+    /**
+     * Interactive Terminal Management Console.
+     */
+    private static void runInteractiveMenu() {
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+
+        System.out.println("==========================================================================================");
+        System.out.println("      WIND TURBINE FLEET ENGINE : INTERACTIVE OPERATIONS CONSOLE                          ");
+        System.out.println("==========================================================================================");
+
+        // Run batch once initially to populate telemetry
+        runBatchEngine();
+
+        while (running) {
+            System.out.println("\n------------------------------------------------------------------------------------------");
+            System.out.println("FLEET MANAGEMENT MENU:");
+            System.out.println("  1. Re-run Batch SCADA Ingestion & Refresh Reports");
+            System.out.println("  2. Lookup Turbine Asset by Serial ID (e.g. TURB-OFF-1001)");
+            System.out.println("  3. List All Tripped / Locked-Out Assets");
+            System.out.println("  4. View Generation & Capacity Factor Rankings");
+            System.out.println("  5. Run Automated Unit & Formula Test Suite (FleetEngineTest)");
+            System.out.println("  0. Exit Console");
+            System.out.print("Enter command choice [0-5]: ");
+
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1":
+                    runBatchEngine();
+                    break;
+                case "2":
+                    System.out.print("Enter Turbine Serial ID (Format: TURB-[A-Z]{2,4}-\\d{4}): ");
+                    String id = scanner.nextLine().trim().toUpperCase();
+                    if (latestResults.containsKey(id)) {
+                        PredictiveWorker.TelemetryResult r = latestResults.get(id);
+                        System.out.println("\n--- ASSET STATUS: " + id + " ---");
+                        System.out.printf("Category        : %s%n", r.category);
+                        System.out.printf("Health Score    : %.2f / 100.00%n", r.healthScore);
+                        System.out.printf("Health Band     : %s%n", r.healthBand);
+                        System.out.printf("Capacity Factor : %.2f %%%n", r.capacityFactor);
+                        System.out.printf("Brake Lock      : %s%n", r.brakeLockTriggered ? "LOCKED (SAFETY TRIP)" : "DISENGAGED (NORMAL)");
+                        System.out.printf("Offline Status  : %s%n", r.trippedOffline ? "TRIPPED / OFFLINE" : "ONLINE / GENERATING");
+                    } else {
+                        System.out.println("[NOTICE] Turbine Serial ID not found in current telemetry batch: " + id);
+                    }
+                    break;
+                case "3":
+                    System.out.println("\n--- SAFETY LOCKOUT AUDIT LIST ---");
+                    int trips = 0;
+                    for (PredictiveWorker.TelemetryResult r : latestResults.values()) {
+                        if (r.trippedOffline) {
+                            trips++;
+                            System.out.printf("  * [%-15s] Category: %-26s | THI: %6.2f | Brake Lock: %s%n",
+                                r.turbineId, r.category, r.healthScore, r.brakeLockTriggered ? "TRUE" : "FALSE");
+                        }
+                    }
+                    if (trips == 0) {
+                        System.out.println("  No turbines currently tripped.");
+                    }
+                    break;
+                case "4":
+                    System.out.println("\n--- FLEET CAPACITY FACTOR RANKING ---");
+                    latestResults.values().stream()
+                        .sorted((a, b) -> Double.compare(b.capacityFactor, a.capacityFactor))
+                        .forEach(r -> System.out.printf("  * [%-15s] %-26s -> Capacity Factor: %6.2f %% (THI: %.2f)%n",
+                            r.turbineId, r.category, r.capacityFactor, r.healthScore));
+                    break;
+                case "5":
+                    FleetEngineTest.main(new String[]{});
+                    break;
+                case "0":
+                    running = false;
+                    System.out.println("[EXIT] Exiting Fleet Operations Console. Goodbye!");
+                    break;
+                default:
+                    System.out.println("[INVALID] Unrecognized choice. Please enter 0, 1, 2, 3, 4, or 5.");
+            }
+        }
     }
 }
